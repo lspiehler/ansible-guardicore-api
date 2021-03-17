@@ -1,0 +1,16 @@
+---
+  - hosts: localhost
+    connection: local
+    gather_facts: false
+    tasks:
+      - name: Get Guardicore assets
+        uri:
+          url: "https://{{management_server}}/api/v3.0/assets"
+          method: GET
+          headers:
+            Authorization: bearer {{ lookup('env','GCJWT') }}
+          status_code: 200
+        register: asset_response
+      - name: Print assets
+        ansible.builtin.debug:
+          msg: "{{ asset_response }}"

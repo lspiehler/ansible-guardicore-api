@@ -1,0 +1,17 @@
+---
+  - hosts: localhost
+    connection: local
+    gather_facts: false
+    tasks:
+      - name: Get Guardicore label
+        uri:
+          url: "https://{{management_server}}/api/v3.0/visibility/labels?find_matches=true&dynamic_criteria_limit=5000&key={{label.key}}&value={{label.value}}"
+          method: GET
+          headers:
+            Authorization: bearer {{ lookup('env','GCJWT') }}
+          status_code: 200
+        register: label_response
+      - name: Print returned label
+        ansible.builtin.debug:
+          msg: "{{ label_response }}"
+          #msg: "{{ label_response.json.objects[0].dynamic_criteria|length }}"

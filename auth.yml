@@ -1,0 +1,18 @@
+---
+  - hosts: localhost
+    connection: local
+    gather_facts: false
+    tasks:
+      - name: Get a JWT token to authenticate API requests
+        uri:
+          url: https://{{management_server}}/api/v3.0/authenticate
+          method: POST
+          body_format: json
+          body:
+            username: "{{ lookup('env','GCUSER') }}"
+            password: "{{ lookup('env','GCPASS') }}"
+          status_code: 200
+        register: login
+      - name: Print the JWT token
+        ansible.builtin.debug:
+          msg: "{{ login.cookies.JWT_AUTH_TOKEN }}"

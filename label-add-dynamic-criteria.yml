@@ -1,0 +1,48 @@
+---
+  - hosts: localhost
+    connection: local
+    gather_facts: false
+    tasks:
+      - name: Get Guardicore label
+        uri:
+          url: "https://{{management_server}}/api/v3.0/visibility/labels?find_matches=true&dynamic_criteria_limit=5000&key={{label.key}}&value={{label.value}}"
+          timeout: 60
+          method: GET
+          headers:
+            Authorization: bearer {{ lookup('env','GCJWT') }}
+          status_code: 200
+        register: label_response
+      #- name: Show dynamic criteria list for request
+      #  debug:
+      #    var: label
+      - name: Add existing dynamic criteria to list
+        set_fact:
+          dynamic_criteria: "{{ dynamic_criteria | default([]) }} + [{'field': '{{item.field}}','op': '{{item.op}}','hasValue': true,'argument': '{{item.argument}}'}]"
+        with_items:
+          - "{{ label_response.json.objects[0].dynamic_criteria }}"
+      - name: Add new dynamic criteria to list
+        set_fact:
+          dynamic_criteria: "{{ dynamic_criteria | default([]) }} + [{'field': '{{item.field}}','op': '{{item.op}}','hasValue': true,'argument': '{{item.argument}}','isNew': true,'hasError': false}]"
+        with_items:
+          - "{{ new_dynamic_criteria }}"
+      #- name: Show dynamic criteria list for request
+      #  debug:
+      #    var: dynamic_criteria
+      - name: Update label
+        uri:
+          url: "https://cus-2599.cloud.guardicore.com/api/v3.0/visibility/labels/{{label_response.json.objects[0].id}}"
+          timeout: 60
+          method: PUT
+          body_format: json
+          headers:
+            Authorization: bearer {{ lookup('env','GCJWT') }}
+          body:
+            key: "{{label.key}}"
+            value: "{{label.value}}"
+            dynamic_criteria: "{{dynamic_criteria}}"
+            dynamic_criteria_counter: "{{label_response.json.objects[0].dynamic_criteria | length}}"
+          status_code: 200
+        register: update_response
+      - name: Show API response
+        ansible.builtin.debug:
+          msg: "{{ update_response }}"
