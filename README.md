@@ -13,6 +13,27 @@ git clone https://github.com/lspiehler/ansible-guardicore-api.git
 cd ansible-guardicore-api
 ```
 
+# Authenticate and get a JWT
+### Set environment variables
+```
+export GCUSER=youruser
+export GCPASS=yourpassword
+ansible-playbook auth.yml
+```
+### Example vars.yml file:
+```
+cat << EOF > vars.yml
+management_server: cus-2599.cloud.guardicore.com
+EOF
+```
+### Run the playbook
+```
+ansible-playbook auth.yml -e @vars.yml
+```
+Use the response from the previous command to set your JWT environment variable to be used for API requests
+```
+export GCJWT=iOjE2MTU5ODYzNzMsImlhdCI6MTYxNTg5OmJmIjoxNjE1ODk5OTczLCJpZGVZGVudGl0eSI6ImFkbWluIiwicmFuZCI6IjQwNDwNDNiMzBhLWNlZDItNGQyMi05YjczLTBRu1VFGbB3AlN7KVjb5DuK5qbfT_h0qBDgHceyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9hdCI6MTYxNTg5OTk3MywibmJmIjoxNjE1ODk5OTczLCJ
+```
 # List Assets
 ### Example vars.yml file:
 ```
