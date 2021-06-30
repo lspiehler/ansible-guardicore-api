@@ -5,7 +5,7 @@
     tasks:
       - name: Get Guardicore label
         uri:
-          url: "https://{{management_server}}/api/v3.0/visibility/labels?find_matches=true&key={{label.key}}&value={{label.value}}"
+          url: "https://{{management_server}}/api/v3.0/visibility/labels?find_matches=true&dynamic_criteria_limit=5000&key={{label.key}}&value={{label.value}}"
           method: GET
           headers:
             Authorization: bearer {{ lookup('env','GCJWT') }}
@@ -32,8 +32,8 @@
           headers:
             Authorization: bearer {{ lookup('env','GCJWT') }}
           body:
-            key: Site
-            value: Test
+            key: "{{ label.key }}"
+            value: "{{ label.value }}"
             dynamic_criteria: "{{dynamic_criteria}}"
             dynamic_criteria_counter: "{{label_response.json.objects[0].dynamic_criteria | length}}"
           status_code: 200
