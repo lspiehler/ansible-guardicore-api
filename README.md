@@ -18,7 +18,6 @@ cd ansible-guardicore-api
 ```
 export GCUSER=youruser
 export GCPASS=yourpassword
-ansible-playbook auth.yml
 ```
 ### Example vars.yml file:
 ```
