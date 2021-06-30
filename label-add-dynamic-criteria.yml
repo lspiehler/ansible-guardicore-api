@@ -1,6 +1,8 @@
 ---
   - hosts: localhost
     connection: local
+    vars:
+      append: true
     gather_facts: false
     tasks:
       - name: Get Guardicore label
@@ -20,6 +22,7 @@
           dynamic_criteria: "{{ dynamic_criteria | default([]) }} + [{'field': '{{item.field}}','op': '{{item.op}}','hasValue': true,'argument': '{{item.argument}}'}]"
         with_items:
           - "{{ label_response.json.objects[0].dynamic_criteria }}"
+        when: append
       - name: Add new dynamic criteria to list
         set_fact:
           dynamic_criteria: "{{ dynamic_criteria | default([]) }} + [{'field': '{{item.field}}','op': '{{item.op}}','hasValue': true,'argument': '{{item.argument}}','isNew': true,'hasError': false}]"
